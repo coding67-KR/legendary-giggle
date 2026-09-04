@@ -16,6 +16,7 @@ import org.luaj.vm2.lib.jse.JsePlatform;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class MainActivity extends Activity {
     private Globals globals;
@@ -27,7 +28,10 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         globals = JsePlatform.standardGlobals();
         try (InputStream in = getAssets().open("main.lua")) {
-            game = globals.load(in, "main.lua", "t").call();
+            // LuaJ 3.0.1 exposes the Reader overload; InputStream is not accepted directly.
+            try (InputStreamReader reader = new InputStreamReader(in)) {
+                game = globals.load(reader, "main.lua", globals).call();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
