@@ -26,9 +26,16 @@ jobs:
       - name: Build release APK
         run: gradle assembleRelease --no-daemon
 
+      - name: Verify APK output
+        run: |
+          echo "APK files produced:"
+          find app/build/outputs -type f -name '*.apk' -print
+          test -n "$(find app/build/outputs -type f -name '*.apk' -print -quit)"
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: LuaCity-release-apk
-          path: app/build/outputs/apk/release/app-release.apk
+          path: app/build/outputs/**/*.apk
           if-no-files-found: error
+          compression-level: 6
